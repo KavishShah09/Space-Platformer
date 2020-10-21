@@ -44,7 +44,5 @@ let level1 = {
 
     doorX: 352,
     doorY: 30,
-    doorWidth: 16,
-    doorHeight: 16,
     destination: undefined,
 }
