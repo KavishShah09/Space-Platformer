@@ -42,15 +42,13 @@ let mapBackground = [
     48, 32, 48, 32, 48, 32, 48, 32, 48, 32, 48, 32, 48, 32, 48, 32, 48, 32, 48, 32, 48, 32, 48, 32,
 ];
 
-
-
-let currentMapBackGround = mapBackground
-let currentMapWorld = level1
-
 buffer.canvas.width = columns * tileSize;
 buffer.canvas.height = rows * tileSize;
 
 function drawMap(map) {
+    if (!map) {
+        updateMap(level1)
+    }
     for (let index = 0; index < map.length; index++) {
         let value = map[index] - 1;
         let sourceX = (value % tilesheet_columns) * tileSize;
@@ -61,10 +59,41 @@ function drawMap(map) {
     }
 }
 
+let currentLevel = level1
+
+let currentMap = {
+    background: mapBackground,
+    level: currentLevel.map,
+    collision_map: currentLevel.collision_map,
+    door: {
+        X: currentLevel.doorX,
+        Y: currentLevel.doorY,
+        width: currentLevel.doorWidth,
+        height: currentLevel.doorHeight,
+        destination: currentLevel.destination
+    },
+}
+
+function updateMap(newLevel) {
+    currentLevel = newLevel
+    currentMap = {
+        background: mapBackground,
+        level: currentLevel.map,
+        collision_map: currentLevel.collision_map,
+        door: {
+            X: currentLevel.doorX,
+            Y: currentLevel.doorY,
+            width: currentLevel.doorWidth,
+            height: currentLevel.doorHeight,
+            destination: currentLevel.destination
+        },
+    }
+}
+
 let jumps = 0;
 
 function isGrounded() {
-    if (player.y > buffer.canvas.height - tileSize - player.height) {
+    if (player.y > buffer.canvas.height - tileSize - (player.height - 4)) {
         return true;
     }
     return false;
@@ -74,7 +103,7 @@ function detectBoundaryCollision() {
     if (isGrounded()) {
         jumps = 0;
         player.jumping = false;
-        player.y = buffer.canvas.height - tileSize - player.height;
+        player.y = buffer.canvas.height - tileSize - (player.height - 4);
         player.y_velocity = 0;
     } else if (player.y < 0) {
         player.y = 0;
@@ -87,6 +116,16 @@ function detectBoundaryCollision() {
     } else if (player.x > buffer.canvas.width - player.width) {
         player.x_velocity = 0;
         player.x = buffer.canvas.width - player.width;
+    }
+}
+
+function detectDoor() {
+    if (player.x > (currentMap.door.X - 1) && player.x < (currentMap.door.X + 1) && player.y > (currentMap.door.Y - 1) && player.y < (currentMap.door.Y + 1)) {
+        if (currentMap.door.destination) {
+            updateMap(currentMap.door.destination)
+        } else {
+            updateMap(level1)
+        }
     }
 }
 
@@ -127,11 +166,12 @@ function gameLoop() {
     player.update();
     player.animation.update();
     detectBoundaryCollision();
+    detectDoor();
 
     buffer.imageSmoothingEnabled = ctx.imageSmoothingEnabled = false;
     buffer.clearRect(0, 0, buffer.canvas.width, buffer.canvas.height)
-    drawMap(currentMapBackGround);
-    drawMap(currentMapWorld);
+    drawMap(currentMap.background);
+    drawMap(currentMap.level);
     player.draw();
     ctx.drawImage(buffer.canvas, 0, 0, buffer.canvas.width, buffer.canvas.height, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -153,8 +193,8 @@ function resize() {
     ctx.canvas.width = Math.floor(display_width * scale);
     ctx.canvas.height = Math.floor(display_height * scale);
 
-    drawMap(currentMapBackGround);
-    drawMap(currentMapWorld);
+    drawMap(currentMap.background);
+    drawMap(currentMap.level);
 }
 
 window.addEventListener("keydown", controller.keyListener);
@@ -164,5 +204,5 @@ tileSheetImage.addEventListener("load", function (event) {
     sprite_sheet.image.addEventListener("load", function (event) {
         resize();
         window.requestAnimationFrame(gameLoop);
-    });
+    }, { once: true });
 }, { once: true });

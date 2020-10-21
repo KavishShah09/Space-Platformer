@@ -5,7 +5,7 @@ class Player {
         this.width = 32;
         this.x = 9;
         this.x_velocity = 0;
-        this.y = 272;
+        this.y = 0;
         this.y_velocity = 0;
         this.animation = new PlayerAnimation()
     }
