@@ -64,7 +64,7 @@ let currentLevel = level1
 let currentMap = {
     background: mapBackground,
     level: currentLevel.map,
-    collision_map: currentLevel.collision_map,
+    collision_map: currentLevel.collison_map,
     door: {
         X: currentLevel.doorX,
         Y: currentLevel.doorY,
@@ -129,6 +129,33 @@ function detectDoor() {
     }
 }
 
+function detectItemCollision(index) {
+    let item_x = (index % columns) * tileSize;
+    let item_y = Math.floor(index / columns) * tileSize;
+    if (player.x > (item_x - tileSize) && player.x < (item_x + tileSize) && player.y > (item_y - tileSize) && player.y < (item_y + tileSize)) {
+        currentMap.level[index] = 00;
+    }
+}
+
+function detectCollision(map) {
+    for (let i = 0; i < map.length; i++) {
+        let value = map[i]
+        switch (value) {
+            case 01:
+                // console.log("01 platform top collide")
+                break;
+            case 02:
+                // console.log("01 platform all side collide")
+                break;
+            case 03:
+                detectItemCollision(i);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 function jump() {
     controller.up.active = false;
     player.jumping = true;
@@ -166,6 +193,7 @@ function gameLoop() {
     player.update();
     player.animation.update();
     detectBoundaryCollision();
+    detectCollision(currentMap.collision_map);
     detectDoor();
 
     buffer.imageSmoothingEnabled = ctx.imageSmoothingEnabled = false;
