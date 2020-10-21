@@ -79,7 +79,7 @@ function updateMap(newLevel) {
     currentMap = {
         background: mapBackground,
         level: currentLevel.map,
-        collision_map: currentLevel.collision_map,
+        collision_map: currentLevel.collison_map,
         door: {
             X: currentLevel.doorX,
             Y: currentLevel.doorY,
@@ -90,7 +90,6 @@ function updateMap(newLevel) {
     }
 }
 
-let jumps = 0;
 
 function isGrounded() {
     if (player.y > buffer.canvas.height - tileSize - (player.height - 4)) {
@@ -120,12 +119,25 @@ function detectBoundaryCollision() {
 }
 
 function detectDoor() {
-    if (player.x > (currentMap.door.X - 1) && player.x < (currentMap.door.X + 1) && player.y > (currentMap.door.Y - 1) && player.y < (currentMap.door.Y + 1)) {
+    if (player.x > (currentMap.door.X - 5) && player.x < (currentMap.door.X + 5) && player.y > (currentMap.door.Y - 5) && player.y < (currentMap.door.Y + 5)) {
         if (currentMap.door.destination) {
             updateMap(currentMap.door.destination)
+            // player.x = 20
+            // player.y = 244
         } else {
             updateMap(level1)
         }
+    }
+}
+
+function detectPlatformCollision(index) {
+    let tile_x = (index % columns) * tileSize;
+    let tile_y = Math.floor(index / columns) * tileSize - 8;
+    if (player.x > (tile_x - tileSize) && player.x < (tile_x + tileSize) && player.y > (tile_y - tileSize) && player.y < (tile_y)) {
+        player.y = tile_y - tileSize
+        player.jumping = false
+        player.y_velocity = 0
+        jumps = 0
     }
 }
 
@@ -138,17 +150,17 @@ function detectItemCollision(index) {
 }
 
 function detectCollision(map) {
-    for (let i = 0; i < map.length; i++) {
-        let value = map[i]
+    for (let index = 0; index < map.length; index++) {
+        let value = map[index]
         switch (value) {
             case 01:
-                // console.log("01 platform top collide")
+                detectPlatformCollision(index);
                 break;
             case 02:
                 // console.log("01 platform all side collide")
                 break;
             case 03:
-                detectItemCollision(i);
+                detectItemCollision(index);
                 break;
             default:
                 break;
@@ -156,6 +168,8 @@ function detectCollision(map) {
     }
 }
 
+
+let jumps = 0;
 function jump() {
     controller.up.active = false;
     player.jumping = true;
@@ -193,8 +207,8 @@ function gameLoop() {
     player.update();
     player.animation.update();
     detectBoundaryCollision();
-    detectCollision(currentMap.collision_map);
     detectDoor();
+    detectCollision(currentMap.collision_map);
 
     buffer.imageSmoothingEnabled = ctx.imageSmoothingEnabled = false;
     buffer.clearRect(0, 0, buffer.canvas.width, buffer.canvas.height)
