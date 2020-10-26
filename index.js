@@ -122,8 +122,6 @@ function detectDoor() {
     if (player.x > (currentMap.door.X - 5) && player.x < (currentMap.door.X + 5) && player.y > (currentMap.door.Y - 5) && player.y < (currentMap.door.Y + 5)) {
         if (currentMap.door.destination) {
             updateMap(currentMap.door.destination)
-            // player.x = 20
-            // player.y = 244
         } else {
             updateMap(level1)
         }
@@ -133,7 +131,7 @@ function detectDoor() {
 function detectPlatformCollision(index) {
     let tile_x = (index % columns) * tileSize;
     let tile_y = Math.floor(index / columns) * tileSize - 8;
-    if (player.x > (tile_x - tileSize) && player.x < (tile_x + tileSize) && player.y > (tile_y - tileSize) && player.y < (tile_y)) {
+    if (player.x > (tile_x - (tileSize / 2)) && player.x < (tile_x + (tileSize / 2)) && player.y > (tile_y - tileSize) && player.y < (tile_y)) {
         player.y = tile_y - tileSize
         player.jumping = false
         player.y_velocity = 0
