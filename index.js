@@ -139,6 +139,29 @@ function detectPlatformCollision(index) {
     }
 }
 
+function detectBoxCollision(index) {
+    let tile_x = (index % columns) * tileSize;
+    let tile_y = Math.floor(index / columns) * tileSize;
+    if (player.x > (tile_x - tileSize) && player.x < (tile_x + tileSize) && player.y > (tile_y - tileSize) && player.y < (tile_y)) {
+        player.y = tile_y - tileSize
+        player.jumping = false
+        player.y_velocity = 0
+        jumps = 0
+    }
+}
+
+function detectSideCollision(index) {
+    let tile_x = (index % columns) * tileSize - 3;
+    let tile_y = Math.floor(index / columns) * tileSize;
+    if (player.x > (tile_x - tileSize) && player.x < (tile_x + tileSize) && player.y > (tile_y - tileSize) && player.y < (tile_y)) {
+        if (player.x_velocity > 0) {
+            player.x = tile_x - tileSize
+        } else {
+            player.x = tile_x + tileSize
+        }
+    }
+}
+
 function detectItemCollision(index) {
     let item_x = (index % columns) * tileSize;
     let item_y = Math.floor(index / columns) * tileSize;
@@ -155,10 +178,13 @@ function detectCollision(map) {
                 detectPlatformCollision(index);
                 break;
             case 02:
-                // console.log("01 platform all side collide")
+                detectBoxCollision(index)
                 break;
             case 03:
                 detectItemCollision(index);
+                break;
+            case 04:
+                detectSideCollision(index);
                 break;
             default:
                 break;
@@ -213,6 +239,15 @@ function gameLoop() {
     drawMap(currentMap.background);
     drawMap(currentMap.level);
     player.draw();
+    if (currentLevel == level6) {
+        buffer.font = "15px Comic Sans MS";
+        buffer.fillStyle = "red";
+        buffer.textAlign = "center";
+        buffer.fillText("Game Over", buffer.canvas.width / 2, buffer.canvas.height / 2);
+        buffer.font = "8px Comic Sans MS";
+        buffer.fillStyle = "red";
+        buffer.fillText("Level 1", 17, 215);
+    }
     ctx.drawImage(buffer.canvas, 0, 0, buffer.canvas.width, buffer.canvas.height, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
     window.requestAnimationFrame(gameLoop);
