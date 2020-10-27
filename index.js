@@ -1,5 +1,7 @@
 let buffer = document.createElement("canvas").getContext("2d");
 let ctx = document.querySelector("canvas").getContext("2d");
+let itemAudio = document.getElementById("itemAudio");
+let doorAudio = document.getElementById("doorAudio");
 
 let player = new Player();
 
@@ -121,9 +123,13 @@ function detectBoundaryCollision() {
 function detectDoor() {
     if (player.x > (currentMap.door.X - 5) && player.x < (currentMap.door.X + 5) && player.y > (currentMap.door.Y - 5) && player.y < (currentMap.door.Y + 5)) {
         if (currentMap.door.destination) {
+            doorAudio.load()
+            doorAudio.play()
             updateMap(currentMap.door.destination)
+            score = score + 14
         } else {
             updateMap(level1)
+            location.reload()
         }
     }
 }
@@ -162,11 +168,17 @@ function detectSideCollision(index) {
     }
 }
 
+let score = 0
+
 function detectItemCollision(index) {
     let item_x = (index % columns) * tileSize;
     let item_y = Math.floor(index / columns) * tileSize;
     if (player.x > (item_x - tileSize) && player.x < (item_x + tileSize) && player.y > (item_y - tileSize) && player.y < (item_y + tileSize)) {
+        itemAudio.load();
+        itemAudio.play();
         currentMap.level[index] = 00;
+        currentMap.collision_map[index] = 00;
+        score = score + 1;
     }
 }
 
@@ -239,11 +251,17 @@ function gameLoop() {
     drawMap(currentMap.background);
     drawMap(currentMap.level);
     player.draw();
+    buffer.font = "15px Comic Sans MS";
+    buffer.fillStyle = "white";
+    buffer.textAlign = "left";
+    buffer.fillText("Score: " + score, 10, 15);
     if (currentLevel == level6) {
         buffer.font = "15px Comic Sans MS";
         buffer.fillStyle = "red";
         buffer.textAlign = "center";
         buffer.fillText("Game Over", buffer.canvas.width / 2, buffer.canvas.height / 2);
+        buffer.fillStyle = "white";
+        buffer.fillText("Your Score: " + score, buffer.canvas.width / 2, (buffer.canvas.height / 2) + 15);
         buffer.font = "8px Comic Sans MS";
         buffer.fillStyle = "red";
         buffer.fillText("Level 1", 17, 215);
