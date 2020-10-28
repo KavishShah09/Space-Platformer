@@ -21,6 +21,9 @@ class Controller {
                 if (controller.right.state != key_state) controller.right.active = key_state;
                 controller.right.state = key_state;
                 break;
+            case 72:
+                modal.style.display = "block";
+                break;
         }
     }
 }
