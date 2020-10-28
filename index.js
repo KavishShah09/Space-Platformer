@@ -2,7 +2,6 @@ let buffer = document.createElement("canvas").getContext("2d");
 let ctx = document.querySelector("canvas").getContext("2d");
 let itemAudio = document.getElementById("itemAudio");
 let doorAudio = document.getElementById("doorAudio");
-let bgAudio = document.getElementById("bgAudio");
 
 let player = new Player();
 
@@ -297,9 +296,6 @@ window.addEventListener("resize", resize);
 tileSheetImage.addEventListener("load", function (event) {
     sprite_sheet.image.addEventListener("load", function (event) {
         resize();
-        bgAudio.loop = true;
-        bgAudio.load();
-        bgAudio.play();
         window.requestAnimationFrame(gameLoop);
     }, { once: true });
 }, { once: true });
