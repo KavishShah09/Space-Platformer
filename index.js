@@ -297,7 +297,7 @@ window.addEventListener("resize", resize);
 tileSheetImage.addEventListener("load", function (event) {
     sprite_sheet.image.addEventListener("load", function (event) {
         resize();
-        bgAudio.loop = true
+        bgAudio.loop = true;
         bgAudio.load();
         bgAudio.play();
         window.requestAnimationFrame(gameLoop);
